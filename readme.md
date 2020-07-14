@@ -1,4 +1,4 @@
-# Huzz Bot
+# FutBot
 
 ## Setting Up
 

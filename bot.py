@@ -33,6 +33,10 @@ bot_abuse = {
 
 }
 
+clowned = {
+    
+}
+
 
 def get_leaderboard(region="all"):
     global headers
@@ -127,8 +131,6 @@ def cheaters():
     )
 
     if df.shape[0] >= 1:
-        embed.set_image(url=random.choice(memes["!dodge"]))
-
         origins = "\n".join(list(df["Gamer tag"]))
         wins = "\n".join([str(x) for x in df["Wins"]])
         skill_ratings = "\n".join([str(x) for x in df["SKILL RATING"]])
@@ -304,14 +306,13 @@ async def on_raw_reaction_add(payload):
                 five_mins_ago = datetime.datetime.now() - datetime.timedelta(minutes=5)
                 if bot_abuse.get(message.author.id, five_mins_ago) + datetime.timedelta(minutes=5) <= datetime.datetime.now():
                     await channel.send("<@{}> you're fucking retarded dude.".format(str(message.author.id)))
-
-                    roles = []
-                    for r in message.guild.roles:
-                        if r.id in [673018652794290196]:
-                            roles.append(r)
-                    await message.author.add_roles(*roles)
-
                     bot_abuse[message.author.id] = datetime.datetime.now()
+
+            roles = []
+            for r in message.guild.roles:
+                if r.id in [673018652794290196]:
+                    roles.append(r)
+            await message.author.add_roles(*roles)
 
 @bot.event
 async def on_message(message):

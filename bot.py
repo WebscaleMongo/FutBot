@@ -308,11 +308,11 @@ async def on_raw_reaction_add(payload):
                     await channel.send("<@{}> you're fucking retarded dude.".format(str(message.author.id)))
                     bot_abuse[message.author.id] = datetime.datetime.now()
 
-            roles = []
-            for r in message.guild.roles:
-                if r.id in [673018652794290196]:
-                    roles.append(r)
-            await message.author.add_roles(*roles)
+                roles = []
+                for r in message.guild.roles:
+                    if r.id in [673018652794290196]:
+                        roles.append(r)
+                await message.author.add_roles(*roles)
 
 @bot.event
 async def on_message(message):

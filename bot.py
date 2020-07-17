@@ -310,7 +310,7 @@ async def on_raw_reaction_add(payload):
 
                 roles = []
                 for r in message.guild.roles:
-                    if r.id in [673018652794290196]:
+                    if r.id in [733677756784836719]:
                         roles.append(r)
                 await message.author.add_roles(*roles)
 
@@ -371,14 +371,13 @@ async def on_message(message):
         "!weezy": [dict(file=discord.File("memes/weezytoxic.png"))],
         "!millions": [dict(file=discord.File("memes/millions.png"))],
         ":haha:": [dict(file=discord.File("memes/haha.png"))],
-        "<@&673018652794290196>": [dict(content="Clowns your attention is requested. Clown business.")]
+        "<@&733677756784836719>": [dict(content="Clowns your attention is requested. Clown business.")]
     }
 
     roles = [r.name.lower() for r in message.author.roles]
-    forbidden_words = []
 
     if "autohuzz" in roles:
-        try: await message.add_reaction(bot.get_emoji(711327605189771294))
+        try: await message.add_reaction(bot.get_emoji(733758438516981803))
         except: pass
 
     if "auto-delete-images" in roles:
@@ -389,15 +388,6 @@ async def on_message(message):
     for key in memes.keys():
         if key in content:
             for meme in memes[key]: await message.channel.send(**meme)
-
-    for word in forbidden_words:
-        if word in content.lower():
-            roles = []
-            for r in message.guild.roles:
-                if r.id in [730535721634627671]:
-                    roles.append(r)
-            await message.author.add_roles(*roles)
-            await message.channel.send("<@{}> was muted 10 mins for saying a forbidden word. Automatic unmute doesn't work so message a mod in 10 mins i guess lol".format(message.author.id))
 
     if content.startswith("!futbot"):
         for embed in help(): await message.channel.send(embed=embed)

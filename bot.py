@@ -1,13 +1,17 @@
 import os
 import io
 import uuid
+import glob
+import json
+import time
+import sched
 
 import asyncio
 import statistics
 import random
 import subprocess
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands import Bot
 from bs4 import BeautifulSoup
 
@@ -18,6 +22,7 @@ import plotly.express as px
 
 import requests
 import discord
+import discord.utils
 import datetime
 
 bot = commands.Bot(command_prefix='huzz')
@@ -295,7 +300,6 @@ def help():
 async def on_ready():
     print ("Bot Ready")
 
-
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.emoji.name == "huzaifa":
@@ -313,6 +317,19 @@ async def on_raw_reaction_add(payload):
                     if r.id in [733677756784836719]:
                         roles.append(r)
                 await message.author.add_roles(*roles)
+
+                json.dump(
+                    {
+                        "type": "remove_role",
+                        "id": message.author.id,
+                        "guild": message.guild.id, 
+                        "time": datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(days=1)),
+                        "channel": payload.channel_id
+                    },
+                    open("tasks/{}.json".format(str(uuid.uuid4())), "w")
+                )
+
+                # await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
 
 @bot.event
 async def on_message(message):
@@ -371,10 +388,13 @@ async def on_message(message):
         "!weezy": [dict(file=discord.File("memes/weezytoxic.png"))],
         "!millions": [dict(file=discord.File("memes/millions.png"))],
         ":haha:": [dict(file=discord.File("memes/haha.png"))],
-        "<@&733677756784836719>": [dict(content="Clowns your attention is requested. Clown business.")]
+        "<@&733677756784836719>": [dict(content="<@&733677756784836719> your attention is requested. Clown business.")]
     }
 
     roles = [r.name.lower() for r in message.author.roles]
+
+    if "Bots" in roles:
+        return
 
     if "autohuzz" in roles:
         try: await message.add_reaction(bot.get_emoji(733758438516981803))
@@ -415,4 +435,28 @@ async def on_message(message):
         username = content.split(" ")[1].strip()
         await message.channel.send(embed=rank(username))
 
+@tasks.loop(seconds=1)
+async def run_tasks():
+    for task_file in glob.glob("tasks/*.json"):
+        task = json.load(open(task_file))
+        guild = bot.get_guild(int(task.get("guild", "0")))
+        if task.get("type") == "remove_role" and datetime.datetime.fromtimestamp(task.get("time")) < datetime.datetime.now():
+            try:
+                user = discord.utils.get(guild.members, id=int(task.get("id", "0")))
+                role = discord.utils.get(guild.roles, id=733677756784836719)
+                await user.remove_roles(role)
+
+                channel = bot.get_channel(int(task.get("channel", "0")))
+                await channel.send("<@{}> your clown days have come to an end.".format(user.id))
+
+                os.remove(task_file)
+            except Exception as e:
+                print(e)
+
+
+@run_tasks.before_loop
+async def run_tasks_before():
+    await bot.wait_until_ready()
+
+run_tasks.start()
 bot.run(os.environ.get("DISCORD_TOKEN"))

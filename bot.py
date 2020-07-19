@@ -388,7 +388,7 @@ async def on_message(message):
         "!weezy": [dict(file=discord.File("memes/weezytoxic.png"))],
         "!millions": [dict(file=discord.File("memes/millions.png"))],
         ":haha:": [dict(file=discord.File("memes/haha.png"))],
-        "<@&733677756784836719>": [dict(content="<@&733677756784836719> your attention is requested. Clown business.")]
+        "<@&733677756784836719>": [dict(content="Clowns your attention is requested. Clown business.")]
     }
 
     roles = [r.name.lower() for r in message.author.roles]

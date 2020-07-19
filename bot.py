@@ -329,7 +329,7 @@ async def on_raw_reaction_add(payload):
                     open("tasks/{}.json".format(str(uuid.uuid4())), "w")
                 )
 
-                # await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
+                await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
 
 @bot.event
 async def on_message(message):

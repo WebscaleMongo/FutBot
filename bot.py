@@ -300,11 +300,13 @@ def help():
 async def on_ready():
     print ("Bot Ready")
 
+
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.emoji.name == "huzaifa":
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
+        user_roles = [r.name.lower() for r in message.author.roles]
         for reaction in message.reactions:
             if "huzaifa" in str(reaction) and reaction.count == 6:
                 five_mins_ago = datetime.datetime.now() - datetime.timedelta(minutes=5)
@@ -312,24 +314,28 @@ async def on_raw_reaction_add(payload):
                     await channel.send("<@{}> you're fucking retarded dude.".format(str(message.author.id)))
                     bot_abuse[message.author.id] = datetime.datetime.now()
 
-                roles = []
-                for r in message.guild.roles:
-                    if r.id in [733677756784836719]:
-                        roles.append(r)
-                await message.author.add_roles(*roles)
+                if "Clowns" not in user_roles:
+                    role = discord.utils.get(message.guild.roles, id=733677756784836719)
+                    await message.author.add_roles(role)
 
-                json.dump(
-                    {
-                        "type": "remove_role",
-                        "id": message.author.id,
-                        "guild": message.guild.id, 
-                        "time": datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(days=1)),
-                        "channel": payload.channel_id
-                    },
-                    open("tasks/{}.json".format(str(uuid.uuid4())), "w")
-                )
+                    json.dump(
+                        {
+                            "type": "remove_role",
+                            "id": message.author.id,
+                            "guild": message.guild.id, 
+                            "time": datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(days=1)),
+                            "channel": payload.channel_id
+                        },
+                        open("tasks/{}.json".format(str(uuid.uuid4())), "w")
+                    )
 
-                await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
+                    await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
+            elif "huzaifa" in str(reaction) and reaction.count == 15 and "Clowns" in user_roles:
+                role = discord.utils.get(message.guild.roles, id=734476386051424309)
+                await message.author.add_roles(role)
+
+                await channel.send("<@{}> You have been permanently designated as the CEO of Clowns".format(str(message.author.id)))
+
 
 @bot.event
 async def on_message(message):

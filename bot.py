@@ -314,7 +314,7 @@ async def on_raw_reaction_add(payload):
                     await channel.send("<@{}> you're fucking retarded dude.".format(str(message.author.id)))
                     bot_abuse[message.author.id] = datetime.datetime.now()
 
-                if "Clowns" not in user_roles:
+                if "clowns" not in user_roles:
                     role = discord.utils.get(message.guild.roles, id=733677756784836719)
                     await message.author.add_roles(role)
 
@@ -330,7 +330,7 @@ async def on_raw_reaction_add(payload):
                     )
 
                     await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
-            elif "huzaifa" in str(reaction) and reaction.count == 15 and "Clowns" in user_roles:
+            elif "huzaifa" in str(reaction) and reaction.count == 15 and "clowns" in user_roles:
                 role = discord.utils.get(message.guild.roles, id=734476386051424309)
                 await message.author.add_roles(role)
 

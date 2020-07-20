@@ -446,14 +446,16 @@ async def run_tasks():
     for task_file in glob.glob("tasks/*.json"):
         task = json.load(open(task_file))
         guild = bot.get_guild(int(task.get("guild", "0")))
-        if task.get("type") == "remove_role":
+        if task.get("type") == "remove_role" and datetime.datetime.fromtimestamp(task.get("time")) < datetime.datetime.now():
             try:
                 user = discord.utils.get(guild.members, id=int(task.get("id", "0")))
-                role = discord.utils.get(guild.roles, id=733677756784836719)
-                await user.remove_roles(role)
+                roles = [r.name.lower() for r in user.roles]
+                if "clowns" in roles:
+                    role = discord.utils.get(guild.roles, id=733677756784836719)
+                    await user.remove_roles(role)
 
-                channel = bot.get_channel(int(task.get("channel", "0")))
-                await channel.send("<@{}> your clown days have come to an end.".format(user.id))
+                    channel = bot.get_channel(int(task.get("channel", "0")))
+                    await channel.send("<@{}> your clown days have come to an end.".format(user.id))
 
                 os.remove(task_file)
             except Exception as e:

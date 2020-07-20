@@ -308,7 +308,7 @@ async def on_raw_reaction_add(payload):
         message = await channel.fetch_message(payload.message_id)
         user_roles = [r.name.lower() for r in message.author.roles]
         for reaction in message.reactions:
-            if "huzaifa" in str(reaction) and reaction.count == 6:
+            if "huzaifa" in str(reaction) and reaction.count == 10:
                 five_mins_ago = datetime.datetime.now() - datetime.timedelta(minutes=5)
                 if bot_abuse.get(message.author.id, five_mins_ago) + datetime.timedelta(minutes=5) <= datetime.datetime.now():
                     await channel.send("<@{}> you're fucking retarded dude.".format(str(message.author.id)))
@@ -330,7 +330,7 @@ async def on_raw_reaction_add(payload):
                     )
 
                     await channel.send("<@&733677756784836719> please welcome <@{}> as your new member.".format(str(message.author.id)))
-            elif "huzaifa" in str(reaction) and reaction.count == 15 and "clowns" in user_roles:
+            elif "huzaifa" in str(reaction) and reaction.count == 20 and "clowns" in user_roles:
                 role = discord.utils.get(message.guild.roles, id=734476386051424309)
                 await message.author.add_roles(role)
 
@@ -446,7 +446,7 @@ async def run_tasks():
     for task_file in glob.glob("tasks/*.json"):
         task = json.load(open(task_file))
         guild = bot.get_guild(int(task.get("guild", "0")))
-        if task.get("type") == "remove_role" and datetime.datetime.fromtimestamp(task.get("time")) < datetime.datetime.now():
+        if task.get("type") == "remove_role":
             try:
                 user = discord.utils.get(guild.members, id=int(task.get("id", "0")))
                 role = discord.utils.get(guild.roles, id=733677756784836719)

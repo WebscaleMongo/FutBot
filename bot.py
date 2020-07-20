@@ -446,7 +446,7 @@ async def run_tasks():
     for task_file in glob.glob("tasks/*.json"):
         task = json.load(open(task_file))
         guild = bot.get_guild(int(task.get("guild", "0")))
-        if task.get("type") == "remove_role" and datetime.datetime.fromtimestamp(task.get("time")) < datetime.datetime.now():
+        if task.get("type") == "remove_role":
             try:
                 user = discord.utils.get(guild.members, id=int(task.get("id", "0")))
                 roles = [r.name.lower() for r in user.roles]

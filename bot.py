@@ -42,6 +42,10 @@ clowned = {
     
 }
 
+silenced = {
+
+}
+
 
 def get_leaderboard(region="all"):
     global headers
@@ -296,6 +300,10 @@ def help():
     return [utility_embed, memes_embed]
 
 
+async def silence(user):
+    pass
+
+
 @bot.event
 async def on_ready():
     print ("Bot Ready")
@@ -379,6 +387,7 @@ async def on_message(message):
         "!kill": [dict(file=discord.File("memes/okocha.png"))],
         "!elon": [dict(file=discord.File("memes/elon.jpg"))],
         "!huzz": [dict(file=discord.File("memes/huzz.png"))],
+        "!deadrapper": [dict(file=discord.File("memes/deadrapper.png"))],
         "!forbidden": [
             dict(
                 content="Pantel enjoys his shit flaked weetabix + coffee for breakfast, logs on to find his watch list cleared by sparty and his trade pile full of random 'extinct' bronzes listed for max price that will never sell. He then thinks at least the 200m coin time with PIM fullbacks and GK will unlock spartlingz full potential, little does he know that Elon Musk had recently bought Florida power company, the final piece of Elon, the forbidden one",
@@ -440,17 +449,38 @@ async def on_message(message):
     elif content.startswith("!myrank"):
         username = content.split(" ")[1].strip()
         await message.channel.send(embed=rank(username))
+    elif content.startswith("!silence"):
+        comamnds = content.split(" ")
+        commands = [c for c in commands if not c.startswith("!s") and len(c) >= 1]
+        
+        user = discord.utils.get(guild.members, id=int(comamnds[0]))
+        roles = [r.name.lower() for r in user.roles]
+        if "clowns" in roles:
+            if silenced.get(user.id, datetime.datetime.now()) <= datetime.datetime.now():
+                silence(user, channel)
+                silenced[user.id] = datetime.datetime.now() + datetime.timedelta(minutes=10)
+            else:
+                await channel.send("<@{}> too soon. You gotta wait at least 10 minutes before previous silence".format(message.author.id))
+        else:
+             await channel.send("<@{}> you can't silence a non clown. You have been silenced for your clownery instead".format(message.author.id))
 
 @tasks.loop(seconds=1)
 async def run_tasks():
     for task_file in glob.glob("tasks/*.json"):
         task = json.load(open(task_file))
         guild = bot.get_guild(int(task.get("guild", "0")))
-        if task.get("type") == "remove_role" and datetime.datetime.fromtimestamp(task.get("time")) < datetime.datetime.now():
+        if datetime.datetime.fromtimestamp(task.get("time")) < datetime.datetime.now():
             try:
                 user = discord.utils.get(guild.members, id=int(task.get("id", "0")))
                 roles = [r.name.lower() for r in user.roles]
-                if "clowns" in roles:
+                if task.get("type") == "remove_role" and "clowns" in roles:
+                    role = discord.utils.get(guild.roles, id=733677756784836719)
+                    await user.remove_roles(role)
+
+                    channel = bot.get_channel(int(task.get("channel", "0")))
+                    await channel.send("<@{}> your clown days have come to an end.".format(user.id))
+
+                if task.get("type") == "unmute":
                     role = discord.utils.get(guild.roles, id=733677756784836719)
                     await user.remove_roles(role)
 
